@@ -1,0 +1,42 @@
+﻿@inject IJSRuntime js
+@implements IAsyncDisposable
+
+<div class="my-component">
+    This component is defined in the <strong>Blazor.Razor.Shared</strong> library.
+</div>
+
+<p>
+    <button @onclick="TriggerPrompt">Trigger browser window prompt</button>
+</p>
+
+<p>
+    @result
+</p>
+
+@code {
+    private IJSObjectReference? module;
+    private string? result;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Blazor.Razor.Shared/Components/Component1.razor.js");
+        }
+    }
+
+    private async Task TriggerPrompt()
+    {
+        result = await Prompt("Provide some text");
+    }
+
+    public async ValueTask<string?> Prompt(string message) =>
+        module is not null ?
+            await module.InvokeAsync<string>("showPrompt", message) : null;
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module is not null)
+            await module.DisposeAsync();
+    }
+}
