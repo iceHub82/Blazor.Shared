@@ -1,0 +1,18 @@
+﻿@page "/Logout"
+
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="loader loader-bouncing"><span>Redirecting...</span></div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ((ExternalAuthStateProvider)AuthenticationStateProvider).Logout();
+
+        navigationManager.NavigateTo("/Login");
+    }
+}
